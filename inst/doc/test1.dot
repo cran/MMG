@@ -1,0 +1,10 @@
+digraph network
+{
+	6 -> 1;
+	6 -> 5;
+	5 -> 6;
+	1 -> 6;
+	1 [color="#99194c", style=filled];
+	5 [color="#99194c", style=filled];
+	6 [color="#f80700", style=filled];
+}

@@ -1,0 +1,2 @@
+useDynLib(MMG)
+export(MMG.compute, MMG.cut.graph, MMG.make.dot)

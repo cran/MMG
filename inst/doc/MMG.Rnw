@@ -1,0 +1,193 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+%\VignetteIndexEntry{1. MMG primer}
+%\VignetteKeywords{MMG}
+%\VignettePackage{MMG}
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper]{geometry}
+\usepackage{hyperref}
+
+\newcommand*{\code}[1]{\texttt{#1}}
+
+\author{J.\ Noirel, G.\ Sanguinetti, and P.\ C.\ Wright\\
+        Chemical and Process Engineering --- Computer Science\\
+        University of Sheffield, United Kingdom}
+\title {Description of the package MMG\\
+        (version 1.2.1)}
+\year = 2008 \month = 5 \day = 16
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+The \code{MMG} package is part of the BioConductor\footnote{\url{http://www.bioconductor.org/}} project.
+
+\medbreak
+
+\begin{list}{}{}
+  \item[\itshape Abstract of the orginal paper]
+A fundamental task in systems biology is the identification of groups of genes that are involved in the cellular response to particular signals. At its simplest level, this often reduces to identifying biological quantities (mRNA abundance, enzyme concentrations, etc.) which are differentially expressed in two different conditions. Popular approaches involve using t-test statistics, based on modelling the data as arising from a mixture distribution. A common assumption of these approaches is that the data are independent and identically distributed; however, biological quantities are usually related through a complex (weighted) network of interactions, and often the more pertinent question is which subnetworks are differentially expressed, rather than which genes. Furthermore, in many interesting cases (such as high-throughput proteomics and metabolomics), only very partial observations are available, resulting in the need for efficient imputation techniques.
+
+We introduce Mixture Model on Graphs (MMG), a novel probabilistic model to identify differentially expressed submodules of biological networks and pathways. The method can easily incorporate information about weights in the network, is robust against missing data and can be easily generalized to directed networks. We propose an efficient sampling strategy to infer posterior probabilities of differential expression, as well as posterior probabilities over the model parameters. We assess our method on artificial data demonstrating significant improvements over standard mixture model clustering. Analysis of our model results on quantitative high-throughput proteomic data leads to the identification of biologically significant subnetworks, as well as the prediction of the expression level of a number of enzymes, some of which are then verified experimentally.
+\end{list}
+
+\medbreak
+
+MMG relies on a~Gibbs sampler to evaluate the posterior probability of certain genes to be down-regulated, up-regulated or merely unchanged depending on their location in the metabolic network and proteomic measurements.  (Other networks and other sources of relative measurement may be considered.)  This package furthermore implements a~function to retrieve subnetworks that seem to behave consistently (which are overall down-regulated or up-regulated, for instance).
+
+\bigbreak
+
+\noindent \textbf{Note:} If you use this package please cite
+%
+\begin{list}{}{}
+\item
+  Sanguinetti,~G.\ \emph{et~al.},
+  ``MMG: a probabilistic tool to identify submodules of metabolic pathways'',
+  \emph{Bioinformatics}, \textbf{8}, pp.~1078-1084, 2008.
+\end{list}
+
+\section{Quick start}
+
+There are three important functions:
+%
+\begin{description}
+\item[MMG.compute]   Runs the Gibbs sampler.
+\item[MMG.cut.graph] Identify parts of the network that behave consistently.
+\item[MMG.make.dot]  Produces a DOT~file in order to visualise the result of \code{MMG.cut.grahp}
+\end{description}
+
+The inputs are as follows:
+%
+\begin{itemize}
+\item \code{MMG.compute} uses an~input file that described the network of interest and the measurements that are available.  The network may be directed.  The $k$th line must resemble:
+%
+\begin{list}{}{}
+\item
+  $k$\qquad $m_k$\qquad $n_{k1}$\ $w_{k1}$\qquad
+  $n_{k2}$\ $w_{k2}$\qquad \dots\qquad
+  $n_{kN}$\ $w_{kN}$
+\end{list}
+
+The interpretation of the line is the following:
+%
+\begin{itemize}
+\item $k$ is provided for legibility's sake (it could be any number),
+\item $m_k$ is the relative measurement ($\log_2$-ratio, or \code{NA} when not available),
+\item there are $N$ neighbours within the network, $n_{ki}$ ($1 \leq i\leq N$),
+\item the weight of the connexion $i \to k$ is $w_{ki}$ ($1 \leq i\leq N$) and must be positive.
+\end{itemize}
+\end{itemize}
+
+\subsection{Calling the package}
+
+<<>>=
+library("MMG")
+@
+
+\subsection{Running the Gibbs sampler}
+
+The following file represents a~hexagonal network:
+%
+\begin{verbatim}
+1  NA   6 1  2 1
+2  NA   1 1  3 1
+3  -1.0 2 1  4 1
+4  NA   3 1  5 1
+5  NA   4 1  6 1
+6  +1.0 5 1  1 1
+\end{verbatim}
+%
+Two nodes have measurements, one up, the other down.  The file containing the data is \code{hexag.dat}.  We run \code{MMG.compute} on this file:
+
+<<>>=
+r <- MMG.compute(file.name="hexag.dat", steps=100000, alpha=0.1)
+@
+
+\subsection{Cutting the graph}
+
+There are different methods to cut the graph.  See documentation for a complete description.  \code{MMG.cut.graph} operates on \code{r} as returned by \code{MMG.compute}:
+
+<<>>=
+s <- MMG.cut.graph(r, select="UP")
+@
+
+It prints out the components that looks up-regulated.  Given the simple situation envisaged, only the node~6 ($\log_2$-ratio equal to $+1.0$) and its neighbours have a~substantial probability of being up-regulated (97\%, 59\%, and 59\%).
+
+The \code{components} field has as many entries as there are nodes in the network.
+
+<<>>=
+s$components
+@
+%$
+
+A~value of $0$ means that a~node could not be identified as being up or down, a~positive value~$m$ indicates that the node belongs to the $m$th connected component.  In our example, only one component is identified and therefore only the value~$1$ occurs for node $1$, $5$, and $6$.
+
+\subsection{Producing the DOT file}
+
+The value \code{r} returned by \code{MMG.compute} may be used to produce DOT~files (see the result in Figure~\ref{fig:subnetworks}).
+
+<<>>=
+MMG.make.dot(r, file.name="test1.dot", selection=c(1, 5, 6))
+MMG.make.dot(r, file.name="test2.dot", selection=1:6)
+@
+
+\begin{figure}[ht!]
+  \centering
+  \raisebox{3cm}{(a)}%
+  \includegraphics[width = 3cm]{test1}\hspace*{1cm}%
+  \raisebox{3cm}{(b)}%
+  \includegraphics[width = 5cm]{test2}
+  \caption{Result of the calls \code{MMG.make.dot}.  (a)~The up-regulated selection; (b)~the entire network.  The probabilities $(p_{-}, p_0, p_{+})$ are trivially mapped onto the RGB colour scheme.  Therefore, red indicates likely to be up-regulated nodes and blue likely to be down-regulated nodes.}
+  \label{fig:subnetworks}
+\end{figure}
+
+\section{Real example}
+
+Here is a~real example that uses the data from the article
+%
+\begin{list}{}{}
+\item Ow, S.~Y.\ \emph{et~al.}, ``Quantitative overview of N$_2$ fixation in \emph{Nostoc punctiforme} ATCC 29133 through cellular enrichments and iTRAQ shotgun proteomics'', submitted to \emph{J\ Prot\ Res}, 2008.
+\end{list}
+
+<<>>=
+# Load the package
+library("MMG")
+
+# Run the Gibbs sampler
+r <- MMG.compute(file.name = "R_net.dat",
+                 steps = 50000, burn.in = 1000,
+                 sigma = 0.3, alpha = 1)
+
+# n = node number?
+n <- r$dat$n.nodes; n
+
+# Cut the graph
+s <- MMG.cut.graph(r, descriptions = "R_descr.dat",
+                   method = "THRESHOLD",
+                   threshold = 0.25, select = "UP")
+
+# Get the indices of the nodes that are up-regulated
+l <- (1:n)[s$components != 0]; l
+
+# Produce a DOT file
+MMG.make.dot(r, file.name = "nostoc.dot",
+             selection = l, type = "UNDIRECTED",
+             rem.loops = TRUE)
+@
+
+The result is presented in Figure~\ref{fig:Nostoc}
+
+\begin{figure}[ht!]
+  \centering
+  \includegraphics[width = 7cm]{nostoc}
+  \caption{Up-regulated pathways in \emph{Nostoc punctiforme}'s metabolic network in nitrogen-fixing conditions.}
+  \label{fig:Nostoc}
+\end{figure}
+
+\end{document}
