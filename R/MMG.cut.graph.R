@@ -4,7 +4,7 @@
 #
 # DESCRIPTION:	Outputs a DOT file with the network in it.
 #
-# VERSION:     1.2.1
+# VERSION:     1.2.2
 #
 # AUTHOR:      Josselin Noirel <j.noirel@sheffield.ac.uk>
 #

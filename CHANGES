@@ -1,3 +1,7 @@
 * 1.2.1
 
 - Calls to R_alloc() changed into Calloc().  Added the necessary Free().
+
+* 1.2.2
+
+- Vignette: Added a few \IfFileExists{ <package>.sty }{ }{ }.

@@ -17,7 +17,7 @@ graph network
 	35 -- 329;
 	155 -- 417;
 	11 [color="#ff0000", style=filled];
-	13 [color="#e91600", style=filled];
+	13 [color="#e81700", style=filled];
 	14 [color="#f20d00", style=filled];
 	15 [color="#f10e00", style=filled];
 	22 [color="#f60900", style=filled];
@@ -27,21 +27,21 @@ graph network
 	47 [color="#f80700", style=filled];
 	63 [color="#ff0000", style=filled];
 	98 [color="#b14e00", style=filled];
-	99 [color="#eb1400", style=filled];
+	99 [color="#ea1500", style=filled];
 	122 [color="#fd0200", style=filled];
 	133 [color="#ff0000", style=filled];
-	151 [color="#c23d00", style=filled];
-	155 [color="#f20d00", style=filled];
+	151 [color="#c13e00", style=filled];
+	155 [color="#f30c00", style=filled];
 	161 [color="#ad5200", style=filled];
 	179 [color="#e21d00", style=filled];
 	196 [color="#ee1100", style=filled];
 	203 [color="#c33c00", style=filled];
-	209 [color="#a15e00", style=filled];
+	209 [color="#a25d00", style=filled];
 	228 [color="#fe0100", style=filled];
 	230 [color="#a75800", style=filled];
 	280 [color="#ff0000", style=filled];
-	329 [color="#bf4000", style=filled];
-	404 [color="#e21d00", style=filled];
+	329 [color="#bd4200", style=filled];
+	404 [color="#e11e00", style=filled];
 	417 [color="#ff0000", style=filled];
-	420 [color="#b34c00", style=filled];
+	420 [color="#b24d00", style=filled];
 }

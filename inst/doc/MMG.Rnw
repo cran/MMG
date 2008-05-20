@@ -2,12 +2,20 @@
 %\VignetteIndexEntry{1. MMG primer}
 %\VignetteKeywords{MMG}
 %\VignettePackage{MMG}
-\documentclass{article}
+\documentclass[a4paper]{article}
 
-\usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage[a4paper]{geometry}
-\usepackage{hyperref}
+\IfFileExists{lmodern.sty}{%
+  \usepackage[T1]{fontenc}
+  \usepackage{lmodern}
+}{}
+\IfFileExists{geometry.sty}{%
+  \usepackage{geometry}
+}{}
+\IfFileExists{hyperref.sty}{%
+  \usepackage{hyperref}
+}{%
+  \newcommand*{\url}[1]{\texttt{#1}}
+}
 
 \newcommand*{\code}[1]{\texttt{#1}}
 
@@ -15,8 +23,8 @@
         Chemical and Process Engineering --- Computer Science\\
         University of Sheffield, United Kingdom}
 \title {Description of the package MMG\\
-        (version 1.2.1)}
-\year = 2008 \month = 5 \day = 16
+        (version 1.2.2)}
+\year = 2008 \month = 5 \day = 20
 
 \begin{document}
 

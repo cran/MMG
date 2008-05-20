@@ -12,10 +12,10 @@ digraph network
 	6 -> 5;
 	5 -> 6;
 	1 -> 6;
-	1 [color="#99194c", style=filled];
-	2 [color="#4e1998", style=filled];
+	1 [color="#98194d", style=filled];
+	2 [color="#4d1998", style=filled];
 	3 [color="#0007f8", style=filled];
-	4 [color="#4d1999", style=filled];
-	5 [color="#99194c", style=filled];
+	4 [color="#4d1998", style=filled];
+	5 [color="#981a4d", style=filled];
 	6 [color="#f80700", style=filled];
 }

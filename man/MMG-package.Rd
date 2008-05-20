@@ -29,8 +29,8 @@
   \tabular{ll}{
     Package: \tab MMG\cr
     Type:    \tab Package\cr
-    Version: \tab 1.2.1\cr
-    Date:    \tab 2008-05-16\cr
+    Version: \tab 1.2.2\cr
+    Date:    \tab 2008-05-20\cr
     License: \tab GPL-3+\cr
   }
 }
