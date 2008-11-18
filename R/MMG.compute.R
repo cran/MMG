@@ -6,7 +6,7 @@
 #
 # DESCRIPTION:	Outputs a DOT file with the network in it.
 #
-# VERSION:     1.2.2
+# VERSION:     1.4.0
 #
 # AUTHOR:      Josselin Noirel <j.noirel@sheffield.ac.uk>
 #
@@ -90,7 +90,10 @@
   
                                         # Convert in numbers (list)
   f1 <- function (string) {
-    as.numeric(strsplit(string, " +")[[1]])
+    l <- strsplit(string, " +")[[1]]
+    l[l == "NA"] <- NA
+    l <- as.numeric(l)
+    l
   }
   adj.list <- lapply(as.list(lins), f1);
   n.nodes  <- length(adj.list);
@@ -105,8 +108,6 @@
 
   for (i in 1:n.nodes) {
     for (j in 1:length(adj.list[[i]])) {
-                                        # TODO: Invert the weights
-					# TODO: Log(MS)
       adj.mat[i, j] <- adj.list[[i]][j]
     }
   }
@@ -135,17 +136,32 @@
 #	* LUP
 #	* LDOWN
 #	* DATA
+#
+# CHANGE 1.4.0:
+#	Now it is possible to read the MS data from another file, sparing
+#	us the hassle of generating the network again.  (argument "data")
 
-`MMG.compute` <- function(file.name, sigma = 0.3, alpha = 1,
+`MMG.compute` <- function(file.name, data = NA, sigma = 0.3, alpha = 1,
                           burn.in = 1000, steps = 5000) {
 
 # Read the data and create an array of samples
   dat     <- MMG.read.file(file.name);
-  l       <- dim(dat$adj)[2];
+  l       <- dim(dat$adj)[2]; # 2nd dim of the adj list/matrix
   samples <- matrix(0, nrow = 3, ncol = dat$n.nodes);
   lup     <- rep(0.0, times = steps);
   ldown   <- rep(0.0, times = steps);
 
+  # Read the MS data from another file?
+  if (! is.na(data)) {
+    ms <- read.table(data)[, 1]
+    if (length(ms) != dat$n) {
+      stop("DATA file and NET file have non-matching lengths")
+    }
+    for (i in 1:length(ms)) {
+      dat$adj[i, 2] = ms[i]
+    }
+  }
+  
   r <- .C("MMG_compute",
   #                                                No. Meaning           (dims)    [C-equiv]
   # Data

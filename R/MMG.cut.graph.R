@@ -4,7 +4,7 @@
 #
 # DESCRIPTION:	Outputs a DOT file with the network in it.
 #
-# VERSION:     1.2.2
+# VERSION:     1.4.0
 #
 # AUTHOR:      Josselin Noirel <j.noirel@sheffield.ac.uk>
 #
@@ -139,9 +139,9 @@
       for (i in 1:dat$n.nodes) {
         if (r[[10]][i] == cat) {
           ss <- if (is.na(dsc[1]))
-            sprintf("  * Node %3d %.3lf [%1.3lf %1.3lf %1.3lf]\n",    i, dat$adjacency[i, 2], samples[i, 1], samples[i, 2], samples[i,3])
+            sprintf("  * Node %3d %.3f [%1.3f %1.3f %1.3f]\n",    i, dat$adjacency[i, 2], samples[i, 1], samples[i, 2], samples[i,3])
           else
-            sprintf("  * Node %3d %.3lf [%1.3lf %1.3lf %1.3lf] %s\n", i, dat$adjacency[i, 2], samples[i, 1], samples[i, 2], samples[i,3], dsc[i]);
+            sprintf("  * Node %3d %.3f [%1.3f %1.3f %1.3f] %s\n", i, dat$adjacency[i, 2], samples[i, 1], samples[i, 2], samples[i,3], dsc[i]);
           cat(ss);
         }
       }

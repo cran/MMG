@@ -5,3 +5,9 @@
 * 1.2.2
 
 - Vignette: Added a few \IfFileExists{ <package>.sty }{ }{ }.
+
+* 1.4.0
+
+- C: Invalid "%lf" printf format (Prof. Brian Ripley)
+- R: Invalid "%lf" printf format (Prof. Brian Ripley)
+- MMG.compute(): new argument data,

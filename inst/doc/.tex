@@ -23,9 +23,10 @@
         Chemical and Process Engineering --- Computer Science\\
         University of Sheffield, United Kingdom}
 \title {Description of the package MMG\\
-        (version 1.4.0)}
-\year = 2008 \month = 11 \day = 18
+        (version 1.2.2)}
+\year = 2008 \month = 5 \day = 20
 
+\usepackage{/Library/Frameworks/R.framework/Resources/share/texmf/Sweave}
 \begin{document}
 
 \maketitle
@@ -34,7 +35,7 @@
 
 \section{Introduction}
 
-The \code{MMG} package should soon be part of the BioConductor\footnote{\url{http://www.bioconductor.org/}} project.
+The \code{MMG} package is part of the BioConductor\footnote{\url{http://www.bioconductor.org/}} project.
 
 \medbreak
 
@@ -94,9 +95,11 @@ The interpretation of the line is the following:
 
 \subsection{Calling the package}
 
-<<>>=
-library("MMG")
-@
+\begin{Schunk}
+\begin{Sinput}
+> library("MMG")
+\end{Sinput}
+\end{Schunk}
 
 \subsection{Running the Gibbs sampler}
 
@@ -113,104 +116,6 @@ The following file represents a~hexagonal network:
 %
 Two nodes have measurements, one up, the other down.  The file containing the data is \code{hexag.dat}.  We run \code{MMG.compute} on this file:
 
-<<>>=
-r <- MMG.compute(file.name="hexag.dat", steps=100000, alpha=0.1)
-@
-
-\subsection{Cutting the graph}
-
-There are different methods to cut the graph.  See documentation for a complete description.  \code{MMG.cut.graph} operates on \code{r} as returned by \code{MMG.compute}:
-
-<<>>=
-s <- MMG.cut.graph(r, select="UP")
-@
-
-It prints out the components that looks up-regulated.  Given the simple situation envisaged, only the node~6 ($\log_2$-ratio equal to $+1.0$) and its neighbours have a~substantial probability of being up-regulated (97\%, 59\%, and 59\%).
-
-The \code{components} field has as many entries as there are nodes in the network.
-
-<<>>=
-s$components
-@
-%$
-
-A~value of $0$ means that a~node could not be identified as being up or down, a~positive value~$m$ indicates that the node belongs to the $m$th connected component.  In our example, only one component is identified and therefore only the value~$1$ occurs for node $1$, $5$, and $6$.
-
-\subsection{Producing the DOT file}
-
-The value \code{r} returned by \code{MMG.compute} may be used to produce DOT~files (see the result in Figure~\ref{fig:subnetworks}).
-
-<<>>=
-MMG.make.dot(r, file.name="test1.dot", selection=c(1, 5, 6))
-MMG.make.dot(r, file.name="test2.dot", selection=1:6)
-@
-
-\begin{figure}[ht!]
-  \centering
-  \raisebox{3cm}{(a)}%
-  \includegraphics[width = 3cm]{test1}\hspace*{1cm}%
-  \raisebox{3cm}{(b)}%
-  \includegraphics[width = 5cm]{test2}
-  \caption{Result of the calls \code{MMG.make.dot}.  (a)~The up-regulated selection; (b)~the entire network.  The probabilities $(p_{-}, p_0, p_{+})$ are trivially mapped onto the RGB colour scheme.  Therefore, red indicates likely to be up-regulated nodes and blue likely to be down-regulated nodes.}
-  \label{fig:subnetworks}
-\end{figure}
-
-\subsection{Altering the data}
-
-One can also, alter the data using an additional file.  This only
-affects the values $m_k$.
-
-<<>>==
-r <- MMG.compute(file.name="hexag.dat", data="new.dat", steps=100000, alpha=0.1)
-s <- MMG.cut.graph(r, select="UP")
-s$components
-@
-%$
-
-If manual modifications are needed, the data point $m_k$ is stored in
-\code{r\$dat[$k$,~2]}
-
-\section{Real example}
-
-Here is a~real example that uses the data from the article
-%
-\begin{list}{}{}
-\item Ow, S.~Y.\ \emph{et~al.}, ``Quantitative overview of N$_2$ fixation in \emph{Nostoc punctiforme} ATCC 29133 through cellular enrichments and iTRAQ shotgun proteomics'', submitted to \emph{J\ Prot\ Res}, 2008.
-\end{list}
-
-<<>>=
-# Load the package
-library("MMG")
-
-# Run the Gibbs sampler
-r <- MMG.compute(file.name = "R_net.dat",
-                 steps = 50000, burn.in = 1000,
-                 sigma = 0.3, alpha = 1)
-
-# n = node number?
-n <- r$dat$n.nodes; n
-
-# Cut the graph
-s <- MMG.cut.graph(r, descriptions = "R_descr.dat",
-                   method = "THRESHOLD",
-                   threshold = 0.25, select = "UP")
-
-# Get the indices of the nodes that are up-regulated
-l <- (1:n)[s$components != 0]; l
-
-# Produce a DOT file
-MMG.make.dot(r, file.name = "nostoc.dot",
-             selection = l, type = "UNDIRECTED",
-             rem.loops = TRUE)
-@
-
-The result is presented in Figure~\ref{fig:Nostoc}
-
-\begin{figure}[ht!]
-  \centering
-  \includegraphics[width = 7cm]{nostoc}
-  \caption{Up-regulated pathways in \emph{Nostoc punctiforme}'s metabolic network in nitrogen-fixing conditions.}
-  \label{fig:Nostoc}
-\end{figure}
-
-\end{document}
+\begin{Schunk}
+\begin{Sinput}
+> r <- MMG.compute(file.name = "hexag.dat", steps = 1e+05, alpha = 0.1)

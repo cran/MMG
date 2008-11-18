@@ -23,7 +23,7 @@
   \code{Rgraphviz}).
 }
 \usage{
-r <- MMG.compute(file.name, sigma = 0.3, alpha = 1,
+r <- MMG.compute(file.name, data, sigma = 0.3, alpha = 1,
                  burn.in = 1000, steps = 5000)
 
 s <- MMG.cut.graph(r, method = "THRESHOLD", select = "UP",
@@ -42,6 +42,10 @@ MMG.make.dot(s, file.name, type = "DIRECTED",
              proteomic) data.  See details for complementary details.
              Used in \code{MMG.make.dot}, it indicates the file that
              must be output.}
+
+  \item{data}{Allows the user to override the data values using an
+	additional file.  This may spare the user the inconvenience of
+	re-generating network files all the time.}
 
   \item{sigma}{\code{sigma} is the standard deviation of the unchanged
                category (Gaussian).}

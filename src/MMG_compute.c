@@ -4,7 +4,7 @@
  *
  * DESCRIPTION:	Outputs a DOT file with the network in it.
  *
- * VERSION:     1.2.2
+ * VERSION:     1.4.0
  *
  * AUTHOR:      Josselin Noirel <j.noirel@sheffield.ac.uk>
  *
@@ -125,6 +125,11 @@ void MMG_compute (int	 * dims,    /* dims[0] x dims[1] */
 	double min, max;	       /* min, max of the data */
 	int (*classes)[3];             /* Classes at time t */
 
+#if DEBUG
+	 printf(stderr, "DEBUG mode (DEBUG = %d)\n", DEBUG);
+	fprintf(stderr, "DEBUG mode (DEBUG = %d)\n", DEBUG);
+#endif
+
 	/* 0. Initialisations */
 
 	n = (size_t)dims[0];
@@ -231,6 +236,23 @@ void MMG_compute (int	 * dims,    /* dims[0] x dims[1] */
 #endif
 
 	for (unsigned t = 0U; t < (unsigned)burn_in[0]; t++) {
+#if DEBUG
+		printf("> STEP %u (burn-in)\n"
+		       "\tlambda(-) = %f\n"
+		       "\tlambda(+) = %f\n",
+		       t, lambda_down, lambda_up);
+
+		for (size_t i = 0U; i < n; i++) {
+			if (classes[i][0] == 1)
+				putchar('-');
+			else if (classes[i][1] == 1)
+				putchar('0');
+			else 
+				putchar('+');
+		}
+		putchar('\n');
+#endif
+
 		MMG_Gibbs_sampler(t, n, m, nbnums, msvals, nbs, wts,	   /* Data */
 				  classes, NULL, NULL, NULL,		   /* Arrays */
 				  sigma[0], alpha[0], &lambda_up, &lambda_down, min, max); /* Parameters */
@@ -239,6 +261,10 @@ void MMG_compute (int	 * dims,    /* dims[0] x dims[1] */
 	    /* Collect data */
 
 	for (unsigned t = 0U; t < (unsigned)steps[0]; t++) {
+#if DEBUG
+		printf("> STEP %u\n", t);
+#endif
+
 		MMG_Gibbs_sampler(t, n, m, nbnums, msvals, nbs, wts,	   /* Data */
 				  classes, samples, lup, ldown,		   /* Arrays */
 				  sigma[0], alpha[0], &lambda_up, &lambda_down, min, max); /* Parameters */
@@ -467,21 +493,47 @@ void MMG_class_posterior (size_t ind, size_t n,
 
 	t[0] = t[1] = t[2] = alpha;
 
+#if DEBUG
+	printf("NODE %zu\n", ind);
+	printf("1. t[0] = %f\n"
+	       "   t[1] = %f\n"
+	       "   t[2] = %f\n",
+	       t[0], t[1], t[2]);
+#endif
+
 	/* Loop over ind's neighbours */
 
 	for (size_t i = 0; i < nbnums[ind]; i++) {
 		size_t nb = (size_t)nbs[ind + i * n] - 1; /* C-numbering! */
 		double wt =	    wts[ind + i * n];
 
+#if DEBUG
+		printf("\tNEIGHBOUR %zu %zu %f\n", i, nb, wt);
+#endif
+
 		t[0] += wt * classes[nb][0];
 		t[1] += wt * classes[nb][1];
 		t[2] += wt * classes[nb][2];
 	}
 
+#if DEBUG
+	printf("2. t[0] = %f\n"
+	       "   t[1] = %f\n"
+	       "   t[2] = %f\n",
+	       t[0], t[1], t[2]);
+#endif
+
 	st = t[0] + t[1] + t[2];
 	t[0] /= st;
 	t[1] /= st;
 	t[2] /= st;
+
+#if DEBUG
+	printf("3. t[0] = %f\n"
+	       "   t[1] = %f\n"
+	       "   t[2] = %f\n",
+	       t[0], t[1], t[2]);
+#endif
 
 	if (d > 0) {
 		f[0] = 0.0;
@@ -499,14 +551,59 @@ void MMG_class_posterior (size_t ind, size_t n,
 		f[2] = 1.0;
 	}
 
+#if DEBUG
+	printf("4. f[0] = %f\n"
+	       "   f[1] = %f\n"
+	       "   f[2] = %f\n",
+	       f[0], f[1], f[2]);
+#endif
+
 	f[0] *= t[0];
 	f[1] *= t[1];
 	f[2] *= t[2];
+
+#if DEBUG
+	printf("5. f[0] = %f\n"
+	       "   f[1] = %f\n"
+	       "   f[2] = %f\n",
+	       f[0], f[1], f[2]);
+#endif
 
 	sf = f[0] + f[1] + f[2];
 	f[0] /= sf;
 	f[1] /= sf;
 	f[2] /= sf;
+
+#if DEBUG
+	printf("6. f[0] = %f\n"
+	       "   f[1] = %f\n"
+	       "   f[2] = %f\n\n",
+	       f[0], f[1], f[2]);
+
+	if (! (f[0] >= 0.0 && f[0] <= 1.0 &&
+	       f[1] >= 0.0 && f[1] <= 1.0 &&
+	       f[2] >= 0.0 && f[2] <= 1.0)) {
+		printf("\n"
+		       "ERROR:\tf[0] = %f\n"
+		       "      \tf[1] = %f\n"
+		       "      \tf[2] = %f\n",
+		       f[0], f[1], f[2]);
+
+		printf("\tlambda(-) = %f\n"
+		       "\tlambda(+) = %f\n",
+		       lambda_down, lambda_up);
+		
+		for (size_t i = 0U; i < n; i++) {
+			if (classes[i][0] == 1)
+				putchar('-');
+			else if (classes[i][1] == 1)
+				putchar('0');
+			else 
+				putchar('+');
+		}
+		putchar('\n');
+	}
+#endif
 
 	return;
 }
